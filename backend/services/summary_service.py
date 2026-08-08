@@ -4,7 +4,7 @@ summary_service.py
 Handles conversation summarization using Gemini.
 """
 
-from config import LLM_MODEL
+from config import get_llm_model
 
 
 class SummaryService:
@@ -48,8 +48,8 @@ New Conversation:
 
 Updated Summary:
 """
-
-        response = LLM_MODEL.generate_content(
+        model = get_llm_model()
+        response = model.generate_content(
             prompt
         )
 

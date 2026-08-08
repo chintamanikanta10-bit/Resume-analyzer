@@ -9,7 +9,7 @@ from langchain_core.documents import Document
 from langchain_chroma import Chroma
 
 from config import (
-    EMBEDDING_MODEL,
+    get_embedding_model,
     VECTOR_DB_PATH
 )
 
@@ -21,9 +21,12 @@ class VectorStoreService:
 
     def __init__(self, user_id: int | None = None):
         self.user_id = user_id
-        self.embedding_model = EMBEDDING_MODEL
         self.persist_directory = str(VECTOR_DB_PATH / str(user_id or "shared"))
         self.vector_db = None
+
+    @property
+    def embedding_model(self):
+        return get_embedding_model()
 
     # --------------------------------------------------------
 

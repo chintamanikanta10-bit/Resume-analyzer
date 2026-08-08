@@ -6,7 +6,7 @@ Uses Gemini to extract structured resume information.
 
 import json
 
-from config import LLM_MODEL
+from config import get_llm_model
 from resume.schemas import ResumeSchema
 
 
@@ -84,7 +84,8 @@ Resume:
 """
 
         # Send prompt to Gemini
-        response = LLM_MODEL.generate_content(prompt)
+        model = get_llm_model()
+        response = model.generate_content(prompt)
 
         response_text = response.text.strip()
 

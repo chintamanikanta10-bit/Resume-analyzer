@@ -8,7 +8,7 @@ from typing import List
 
 from langchain_core.documents import Document
 
-from config import EMBEDDING_MODEL
+from config import get_embedding_model
 
 
 class EmbeddingService:
@@ -17,8 +17,11 @@ class EmbeddingService:
     """
 
     def __init__(self):
+        pass
 
-        self.embedding_model = EMBEDDING_MODEL
+    @property
+    def embedding_model(self):
+        return get_embedding_model()
 
     # ----------------------------------------------------
 

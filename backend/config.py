@@ -12,8 +12,9 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-import google.generativeai as genai
-from langchain_huggingface import HuggingFaceEmbeddings
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "change-me-in-production-use-a-long-random-secret-key")
@@ -55,19 +56,34 @@ if not GEMINI_API_KEY:
         "GEMINI_API_KEY is missing. Please add it to the .env file."
     )
 
-genai.configure(api_key=GEMINI_API_KEY)
+_LLM_MODEL = None
 
-LLM_MODEL = genai.GenerativeModel(
-    model_name="models/gemini-3.5-flash"
-)
+def get_llm_model():
+    global _LLM_MODEL
+    if _LLM_MODEL is None:
+        logger.info("Initializing Gemini GenerativeModel (Lazy Load)...")
+        import google.generativeai as genai
+        genai.configure(api_key=GEMINI_API_KEY)
+        _LLM_MODEL = genai.GenerativeModel(
+            model_name="models/gemini-3.5-flash"
+        )
+    return _LLM_MODEL
 
 # ----------------------------------------------------
 # Embedding Model
 # ----------------------------------------------------
 
-EMBEDDING_MODEL = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2"
-)
+_EMBEDDING_MODEL = None
+
+def get_embedding_model():
+    global _EMBEDDING_MODEL
+    if _EMBEDDING_MODEL is None:
+        logger.info("Initializing HuggingFaceEmbeddings (Lazy Load)...")
+        from langchain_huggingface import HuggingFaceEmbeddings
+        _EMBEDDING_MODEL = HuggingFaceEmbeddings(
+            model_name="sentence-transformers/all-MiniLM-L6-v2"
+        )
+    return _EMBEDDING_MODEL
 
 # ----------------------------------------------------
 # RAG Configuration

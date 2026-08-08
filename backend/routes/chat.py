@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 
 from services.summary_service import SummaryService
 
-from config import LLM_MODEL
+from config import get_llm_model
 from core.auth import get_current_user
 from database.models import User
 from memory.memory import MemoryManager
@@ -85,8 +85,8 @@ async def chat(
     # ------------------------------------
     # Ask Gemini
     # ------------------------------------
-
-    response = LLM_MODEL.generate_content(
+    llm = get_llm_model()
+    response = llm.generate_content(
         prompt
     )
     memory.add_ai_message(
