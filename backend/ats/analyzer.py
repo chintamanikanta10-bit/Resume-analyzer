@@ -9,6 +9,8 @@ import json
 
 from services.llm_service import LLMService
 from ats.schemas import ATSReport
+from ats.schemas import ATSResult
+from utils.json_parser import clean_json_response
 
 
 class ATSAnalyzer:
@@ -71,17 +73,8 @@ Return ONLY JSON.
         # Generate response using shared LLM service
         response_text = self.llm.generate(prompt)
 
-        # Remove markdown if Gemini returns it
-        if response_text.startswith("```json"):
-            response_text = response_text.replace("```json", "", 1)
-
-        if response_text.startswith("```"):
-            response_text = response_text.replace("```", "", 1)
-
-        if response_text.endswith("```"):
-            response_text = response_text[:-3]
-
-        response_text = response_text.strip()
+        # Remove markdown code blocks if present
+        response_text = clean_json_response(response_text)
 
         # Debug (remove later)
         print("=" * 80)

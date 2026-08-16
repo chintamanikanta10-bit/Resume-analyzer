@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
-from passlib.context import CryptContext
+import bcrypt
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 
@@ -12,7 +12,7 @@ router = APIRouter(
     tags=["Authentication"]
 )
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 class AuthRequest(BaseModel):
     email: EmailStr
@@ -41,7 +41,7 @@ async def register(
 
     user = User(
         email=request.email,
-        password_hash=pwd_context.hash(request.password),
+        password_hash=bcrypt.hashpw(request.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8'),
     )
     db.add(user)
     db.commit()
@@ -64,7 +64,7 @@ async def login(
         raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="Too many login attempts.")
 
     user = db.query(User).filter(User.email == request.email).first()
-    if not user or not pwd_context.verify(request.password, user.password_hash):
+    if not user or not bcrypt.checkpw(request.password.encode('utf-8'), user.password_hash.encode('utf-8')):
         raise HTTPException(status_code=401, detail="Invalid email or password.")
 
     token = create_token(subject=str(user.id))

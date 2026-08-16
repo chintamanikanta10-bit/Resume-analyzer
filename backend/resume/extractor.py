@@ -8,6 +8,7 @@ import json
 
 from config import get_llm_model
 from resume.schemas import ResumeSchema
+from utils.json_parser import clean_json_response
 
 
 class ResumeExtractor:
@@ -93,16 +94,7 @@ Resume:
         
 
         # Remove markdown if Gemini accidentally returns it
-        if response_text.startswith("```json"):
-            response_text = response_text.replace("```json", "", 1)
-
-        if response_text.startswith("```"):
-            response_text = response_text.replace("```", "", 1)
-
-        if response_text.endswith("```"):
-            response_text = response_text[:-3]
-
-        response_text = response_text.strip()
+        response_text = clean_json_response(response_text)
 
         # Convert JSON string to Python dictionary
         try:

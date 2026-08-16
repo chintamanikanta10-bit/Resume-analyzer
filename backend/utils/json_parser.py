@@ -5,7 +5,7 @@ Utility functions for cleaning LLM JSON responses.
 
 def clean_json_response(response_text: str) -> str:
     """
-    Removes Markdown code blocks from LLM responses.
+    Removes Markdown code blocks and extra text from LLM responses.
 
     Args:
         response_text (str): Raw response from the LLM.
@@ -13,16 +13,18 @@ def clean_json_response(response_text: str) -> str:
     Returns:
         str: Clean JSON string.
     """
-
     response_text = response_text.strip()
+    
+    start_obj = response_text.find('{')
+    end_obj = response_text.rfind('}')
+    
+    start_arr = response_text.find('[')
+    end_arr = response_text.rfind(']')
 
-    if response_text.startswith("```json"):
-        response_text = response_text.replace("```json", "", 1)
-
-    if response_text.startswith("```"):
-        response_text = response_text.replace("```", "", 1)
-
-    if response_text.endswith("```"):
-        response_text = response_text[:-3]
-
-    return response_text.strip()
+    # Determine which comes first, '{' or '['
+    if start_obj != -1 and end_obj != -1 and (start_arr == -1 or start_obj < start_arr):
+        return response_text[start_obj:end_obj + 1]
+    elif start_arr != -1 and end_arr != -1:
+        return response_text[start_arr:end_arr + 1]
+        
+    return response_text

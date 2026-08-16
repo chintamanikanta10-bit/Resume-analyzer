@@ -8,6 +8,7 @@ based on a structured resume and job description.
 import json
 from services.llm_service import LLMService
 from interview.schemas import InterviewReport
+from utils.json_parser import clean_json_response
 
 
 class InterviewGenerator:
@@ -84,17 +85,8 @@ Return ONLY JSON.
 
         response_text = self.llm.generate(prompt)
 
-        # Remove markdown code fences if present
-        if response_text.startswith("```json"):
-            response_text = response_text.replace("```json", "", 1)
-
-        if response_text.startswith("```"):
-            response_text = response_text.replace("```", "", 1)
-
-        if response_text.endswith("```"):
-            response_text = response_text[:-3]
-
-        response_text = response_text.strip()
+        # Remove markdown code blocks if present
+        response_text = clean_json_response(response_text)
 
         print("=" * 80)
         print("Interview Generator Response")

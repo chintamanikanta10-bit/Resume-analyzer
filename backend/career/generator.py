@@ -9,6 +9,7 @@ import json
 
 from services.llm_service import LLMService
 from career.schemas import CareerRoadmap
+from utils.json_parser import clean_json_response
 
 
 class CareerGenerator:
@@ -71,16 +72,7 @@ Return ONLY JSON.
         response_text = self.llm.generate(prompt)
 
         # Remove markdown code blocks if present
-        if response_text.startswith("```json"):
-            response_text = response_text.replace("```json", "", 1)
-
-        if response_text.startswith("```"):
-            response_text = response_text.replace("```", "", 1)
-
-        if response_text.endswith("```"):
-            response_text = response_text[:-3]
-
-        response_text = response_text.strip()
+        response_text = clean_json_response(response_text)
 
         # Debug output (remove in production)
         print("=" * 80)
