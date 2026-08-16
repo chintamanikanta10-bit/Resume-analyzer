@@ -31,14 +31,15 @@ def decode_token(token: str) -> dict:
 
 def set_auth_cookie(response, token: str, expires_minutes: int = 60) -> None:
     response.set_cookie(
-        key=AUTH_COOKIE_NAME,
-        value=token,
-        httponly=True,
-        samesite="lax",
-        secure=os.getenv("COOKIE_SECURE", "false").lower() == "true",
-        max_age=expires_minutes * 60,
-        path="/",
-    )
+    key=AUTH_COOKIE_NAME,
+    value=token,
+    httponly=True,
+    samesite="none",
+    secure=True,
+    max_age=expires_minutes * 60,
+    path="/",
+)
+    
 
 
 def clear_auth_cookie(response) -> None:
