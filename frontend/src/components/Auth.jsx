@@ -8,7 +8,15 @@ const AUTH_FEATURES = [
   { icon: "route", text: "Personalized career roadmaps" },
 ];
 
-export default function Auth({ type, setView, unifiedFetch, setAuthenticatedUser, isLoading, errorMessage, setErrorMessage }) {
+export default function Auth({
+  type,
+  setView,
+  unifiedFetch,
+  setAuthenticatedUser,
+  isLoading,
+  errorMessage,
+  setErrorMessage,
+}) {
   const isLogin = type === "login";
 
   const [authEmail, setAuthEmail] = useState("");
@@ -28,12 +36,25 @@ export default function Auth({ type, setView, unifiedFetch, setAuthenticatedUser
 
     const result = await unifiedFetch("/auth/login", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: authEmail.trim(), password: authPassword }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: authEmail.trim(),
+        password: authPassword,
+      }),
     });
 
     if (result) {
-      setAuthenticatedUser({ email: result.email });
+      // Store JWT token so protected API requests can use it
+      if (result.access_token) {
+        localStorage.setItem("access_token", result.access_token);
+      }
+
+      setAuthenticatedUser({
+        email: result.email,
+      });
+
       setAuthMessage(result.message || "Login successful.");
       setView("app");
     }
@@ -44,7 +65,11 @@ export default function Auth({ type, setView, unifiedFetch, setAuthenticatedUser
     setAuthMessage("");
     setErrorMessage("");
 
-    if (!authEmail.trim() || !authPassword.trim() || !authConfirmPassword.trim()) {
+    if (
+      !authEmail.trim() ||
+      !authPassword.trim() ||
+      !authConfirmPassword.trim()
+    ) {
       setAuthMessage("Please complete all registration fields.");
       return;
     }
@@ -56,12 +81,25 @@ export default function Auth({ type, setView, unifiedFetch, setAuthenticatedUser
 
     const result = await unifiedFetch("/auth/register", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: authEmail.trim(), password: authPassword }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: authEmail.trim(),
+        password: authPassword,
+      }),
     });
 
     if (result) {
-      setAuthenticatedUser({ email: result.email });
+      // Store JWT token returned after registration
+      if (result.access_token) {
+        localStorage.setItem("access_token", result.access_token);
+      }
+
+      setAuthenticatedUser({
+        email: result.email,
+      });
+
       setAuthMessage(result.message || "Account created successfully.");
       setView("app");
     }
@@ -72,15 +110,27 @@ export default function Auth({ type, setView, unifiedFetch, setAuthenticatedUser
       <div className="auth-layout">
         <aside className="auth-brand-panel" aria-hidden="true">
           <div className="auth-brand-top">
-            <span className="auth-brand-mark"><DashboardIcon name="spark" size={22} /></span>
+            <span className="auth-brand-mark">
+              <DashboardIcon name="spark" size={22} />
+            </span>
+
             <span className="auth-brand-name">InsightHub</span>
           </div>
+
           <h2>Your career workspace, powered by AI.</h2>
-          <p>Upload, analyze, and prepare — all in one secure dashboard designed for modern professionals.</p>
+
+          <p>
+            Upload, analyze, and prepare — all in one secure dashboard designed
+            for modern professionals.
+          </p>
+
           <ul className="auth-feature-list">
             {AUTH_FEATURES.map((item) => (
               <li key={item.text}>
-                <span className="auth-feature-icon"><DashboardIcon name={item.icon} size={17} /></span>
+                <span className="auth-feature-icon">
+                  <DashboardIcon name={item.icon} size={17} />
+                </span>
+
                 {item.text}
               </li>
             ))}
@@ -88,56 +138,106 @@ export default function Auth({ type, setView, unifiedFetch, setAuthenticatedUser
         </aside>
 
         <div className="auth-form-panel">
-          <button className="auth-back-link text-button" type="button" onClick={() => { setView("cover"); setAuthMessage(""); setErrorMessage(""); }}>
+          <button
+            className="auth-back-link text-button"
+            type="button"
+            onClick={() => {
+              setView("cover");
+              setAuthMessage("");
+              setErrorMessage("");
+            }}
+          >
             ← Back to home
           </button>
 
           <div className="auth-card">
-            <p className="eyebrow">{isLogin ? "Welcome back" : "Create your account"}</p>
-            <h1>{isLogin ? "Sign in to continue" : "Register for access"}</h1>
+            <p className="eyebrow">
+              {isLogin ? "Welcome back" : "Create your account"}
+            </p>
+
+            <h1>
+              {isLogin ? "Sign in to continue" : "Register for access"}
+            </h1>
+
             <p className="hero-copy">
               {isLogin
                 ? "Enter your credentials to access your career workspace."
                 : "Create an account to unlock resume analysis, ATS scoring, and interview prep."}
             </p>
 
-            {authMessage && <div className="notice notice-loading">{authMessage}</div>}
-            {errorMessage && <div className="notice notice-error">{errorMessage}</div>}
+            {authMessage && (
+              <div className="notice notice-loading">
+                {authMessage}
+              </div>
+            )}
 
-            <form className="panel-form" onSubmit={isLogin ? handleLogin : handleRegister}>
+            {errorMessage && (
+              <div className="notice notice-error">
+                {errorMessage}
+              </div>
+            )}
+
+            <form
+              className="panel-form"
+              onSubmit={isLogin ? handleLogin : handleRegister}
+            >
               <div className="field">
                 <label htmlFor="authEmail">Email address</label>
+
                 <input
                   id="authEmail"
                   type="email"
                   value={authEmail}
-                  onChange={(event) => { setAuthEmail(event.target.value); setAuthMessage(""); setErrorMessage(""); }}
+                  onChange={(event) => {
+                    setAuthEmail(event.target.value);
+                    setAuthMessage("");
+                    setErrorMessage("");
+                  }}
                   placeholder="you@example.com"
                 />
               </div>
+
               <div className="field">
                 <label htmlFor="authPassword">Password</label>
+
                 <input
                   id="authPassword"
                   type="password"
                   value={authPassword}
-                  onChange={(event) => { setAuthPassword(event.target.value); setAuthMessage(""); setErrorMessage(""); }}
+                  onChange={(event) => {
+                    setAuthPassword(event.target.value);
+                    setAuthMessage("");
+                    setErrorMessage("");
+                  }}
                   placeholder="Enter your password"
                 />
               </div>
+
               {!isLogin && (
                 <div className="field">
-                  <label htmlFor="authConfirmPassword">Confirm password</label>
+                  <label htmlFor="authConfirmPassword">
+                    Confirm password
+                  </label>
+
                   <input
                     id="authConfirmPassword"
                     type="password"
                     value={authConfirmPassword}
-                    onChange={(event) => { setAuthConfirmPassword(event.target.value); setAuthMessage(""); setErrorMessage(""); }}
+                    onChange={(event) => {
+                      setAuthConfirmPassword(event.target.value);
+                      setAuthMessage("");
+                      setErrorMessage("");
+                    }}
                     placeholder="Repeat your password"
                   />
                 </div>
               )}
-              <button type="submit" className="primary-button" disabled={isLoading}>
+
+              <button
+                type="submit"
+                className="primary-button"
+                disabled={isLoading}
+              >
                 {isLogin ? "Sign in" : "Create account"}
               </button>
             </form>
@@ -145,9 +245,15 @@ export default function Auth({ type, setView, unifiedFetch, setAuthenticatedUser
             <button
               className="text-button"
               type="button"
-              onClick={() => { setView(isLogin ? "register" : "login"); setAuthMessage(""); setErrorMessage(""); }}
+              onClick={() => {
+                setView(isLogin ? "register" : "login");
+                setAuthMessage("");
+                setErrorMessage("");
+              }}
             >
-              {isLogin ? "Don't have an account? Register" : "Already have an account? Sign in"}
+              {isLogin
+                ? "Don't have an account? Register"
+                : "Already have an account? Sign in"}
             </button>
           </div>
         </div>
