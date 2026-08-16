@@ -9,7 +9,6 @@ import json
 
 from services.llm_service import LLMService
 from ats.schemas import ATSReport
-from ats.schemas import ATSResult
 from utils.json_parser import clean_json_response
 
 
