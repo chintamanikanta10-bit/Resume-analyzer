@@ -42,10 +42,22 @@ Use exactly this structure:
     "target_role": "",
     "current_strengths": [],
     "skills_to_learn": [],
-    "recommended_projects": [],
+    "recommended_projects": [
+        {
+            "title": "",
+            "description": "",
+            "technologies": []
+        }
+    ],
     "recommended_certifications": [],
     "learning_resources": [],
-    "weekly_plan": [],
+    "weekly_plan": [
+        {
+            "week": 1,
+            "focus": "",
+            "topics": []
+        }
+    ],
     "estimated_duration": "",
     "motivation": ""
 }}
