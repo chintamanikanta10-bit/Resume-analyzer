@@ -44,6 +44,53 @@ export default function CareerRoadmap({
     );
   }
 
+  function renderProjects(title, projects) {
+    if (!projects?.length) return null;
+
+    return (
+      <div className="result-block">
+        <h3>{title}</h3>
+        <ul>
+          {projects.map((project, index) => (
+            <li key={`${title}-${index}`}>
+              <strong>{project.title}</strong>
+              {project.description && <p>{project.description}</p>}
+              {project.technologies?.length > 0 && (
+                <p className="technologies-list" style={{fontSize: "0.9em", color: "var(--color-fg-muted)"}}>
+                  <em>Tech: {project.technologies.join(', ')}</em>
+                </p>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+
+  function renderWeeklyPlan(title, planItems) {
+    if (!planItems?.length) return null;
+
+    return (
+      <div className="result-block">
+        <h3>{title}</h3>
+        <div className="weekly-plan">
+          {planItems.map((item, index) => (
+            <div key={`week-${index}`} className="weekly-plan-item" style={{marginBottom: "1rem"}}>
+              <h4>Week {item.week}: {item.focus}</h4>
+              {item.topics?.length > 0 && (
+                <ul style={{marginTop: "0.5rem"}}>
+                  {item.topics.map((topic, i) => (
+                    <li key={`topic-${i}`}>{topic}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   function renderCareerResult() {
     if (!careerResult) {
       return <p className="empty-state">Generate a custom career roadmap that aligns your resume with your target role.</p>;
@@ -60,10 +107,10 @@ export default function CareerRoadmap({
           {renderList("Skills to Learn", careerResult.skills_to_learn)}
         </section>
         <section className="result-card">
-          {renderList("Recommended Projects", careerResult.recommended_projects)}
+          {renderProjects("Recommended Projects", careerResult.recommended_projects)}
           {renderList("Certifications", careerResult.recommended_certifications)}
           {renderList("Resources", careerResult.learning_resources)}
-          {renderList("Weekly Plan", careerResult.weekly_plan)}
+          {renderWeeklyPlan("Weekly Plan", careerResult.weekly_plan)}
           {renderList("Estimated Duration", [careerResult.estimated_duration])}
           {renderList("Motivation", [careerResult.motivation])}
         </section>
